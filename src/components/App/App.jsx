@@ -23,6 +23,10 @@ function App() {
     }
   }
 
+  function removeTrack(track) {
+    setPlaylistTracks(playlistTracks.filter(savedTrack => savedTrack.id !== track.id));
+  }
+
   return (
     <div className={styles.App}>
       <h1>
@@ -31,7 +35,12 @@ function App() {
       <SearchBar />
       <div className={styles['App-playlist']}>
         <SearchResults searchResults={searchResults} addTrack={addTrack} />
-        <Playlist playlistName={playlistName} tracks={playlistTracks} />
+        <Playlist
+          playlistName={playlistName}
+          tracks={playlistTracks}
+          isRemoval={true}
+          removeTrack={removeTrack}
+        />
       </div>
     </div>
   );

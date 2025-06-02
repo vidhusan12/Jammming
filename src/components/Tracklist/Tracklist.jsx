@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './Tracklist.module.css';
 import Track from '../Track/Track';
 
-function Tracklist({ tracks = [], addTrack }) {
+function Tracklist({ tracks = [], addTrack, isRemoval, removeTrack }) {
   return (
     <div className={styles.TrackList}>
       {tracks.map(track => (
@@ -13,6 +13,8 @@ function Tracklist({ tracks = [], addTrack }) {
           artist={track.artist}
           album={track.album}
           addTrack={addTrack}
+          removeTrack={removeTrack}
+          isRemoval={isRemoval}
         />
       ))}
     </div>
