@@ -1,11 +1,11 @@
 import React from 'react';
 import Tracklist from '../Tracklist/Tracklist';
 
-function Playlist() {
+function Playlist({playlistName, playlistTracks}) {
   return (
     <div>
-      <input value="New Playlist" readOnly />
-      <Tracklist />
+      <input value={playlistName} readOnly />
+      <Tracklist tracks={playlistTracks}/>
       <button>Save To Spotify</button>
     </div>
   );

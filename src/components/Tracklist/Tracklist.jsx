@@ -1,13 +1,17 @@
 import React from 'react';
 import Track from '../Track/Track';
 
-function Tracklist() {
-  // Add 3 mock tracks for now
+function Tracklist({ tracks = [] }) {
   return (
     <div>
-      <Track name="Song 1" artist="Artist 1" album="Album 1" />
-      <Track name="Song 2" artist="Artist 2" album="Album 2" />
-      <Track name="Song 3" artist="Artist 3" album="Album 3" />
+      {tracks.map(track => (
+        <Track
+          key={track.id}
+          name={track.name}
+          artist={track.artist}
+          album={track.album}
+        />
+      ))}
     </div>
   );
 }
