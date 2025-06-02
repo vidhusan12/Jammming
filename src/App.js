@@ -1,11 +1,3 @@
-import './App.css';
-
-function App() {
-  return (
-    <div className="App">
-      <h1>Jammming</h1>
-    </div>
-  );
-}
+import App from './components/App/App';
 
 export default App;
