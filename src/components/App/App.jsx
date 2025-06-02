@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
+import styles from './App.module.css';
 import SearchBar from '../SearchBar/SearchBar';
 import SearchResults from '../SearchResults/SearchResults';
 import Playlist from '../Playlist/Playlist';
 
-
-
 function App() {
-
   const [searchResults, setSearchResults] = useState([
     { id: 1, name: 'Song A', artist: 'Artist A', album: 'Album A' },
-    { id: 2, name: 'Song B', artist: 'Artist B', album: 'Album B' }
+    { id: 2, name: 'Song B', artist: 'Artist B', album: 'Album B' },
+    { id: 3, name: 'Song C', artist: 'Artist C', album: 'Album C' }
   ]);
 
   const [playlistName, setPlaylistName] = useState("My Playlist");
@@ -17,13 +16,22 @@ function App() {
     { id: 1, name: 'Song A', artist: 'Artist A', album: 'Album A' },
     { id: 2, name: 'Song B', artist: 'Artist B', album: 'Album B' }
   ]);
+
+  function addTrack(track) {
+    if (!playlistTracks.find(savedTrack => savedTrack.id === track.id)) {
+      setPlaylistTracks([...playlistTracks, track]);
+    }
+  }
+
   return (
-    <div>
-      <h1>Jammming</h1>
+    <div className={styles.App}>
+      <h1>
+        Jammming <span className="highlight">App</span>
+      </h1>
       <SearchBar />
-      <div style={{ display: 'flex', gap: '2rem' }}>
-        <SearchResults searchResults={searchResults} />
-        <Playlist playlistName={playlistName} playlistTracks={playlistTracks}/>
+      <div className={styles['App-playlist']}>
+        <SearchResults searchResults={searchResults} addTrack={addTrack} />
+        <Playlist playlistName={playlistName} tracks={playlistTracks} />
       </div>
     </div>
   );
