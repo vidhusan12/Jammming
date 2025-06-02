@@ -2,10 +2,10 @@ import React from 'react';
 import styles from './Playlist.module.css';
 import Tracklist from '../Tracklist/Tracklist';
 
-function Playlist({ playlistName, tracks, isRemoval, removeTrack }) {
+function Playlist({ playlistName, setPlaylistName, tracks, isRemoval, removeTrack }) {
   return (
     <div className={styles.Playlist}>
-      <input value={playlistName} readOnly />
+      <input onChange={e => setPlaylistName(e.target.value)} value={playlistName} />
       <Tracklist tracks={tracks} isRemoval={isRemoval} removeTrack={removeTrack} />
       <button className={styles['Playlist-save']}>Save To Spotify</button>
     </div>
