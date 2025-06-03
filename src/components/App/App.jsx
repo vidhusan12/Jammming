@@ -38,7 +38,7 @@ function App() {
   }
 
   async function getProfile() {
-    const accessToken = Spotify.getAccessToken();
+    const accessToken = await Spotify.getAccessToken();
 
     const response = await fetch('https://api.spotify.com/v1/me', {
       headers: {
@@ -50,12 +50,10 @@ function App() {
     console.log(data); // Should show your Spotify profile info
   }
 
-  function searchSpotify(term) {
-    Spotify.search(term).then(results => {
-      console.log(results)
-      setSearchResults(results)
-    });
-  }
+async function searchSpotify(term) {
+  const results = await Spotify.search(term); // <-- await here
+  setSearchResults(results);
+}
 
 
   return (

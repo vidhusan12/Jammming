@@ -1,46 +1,60 @@
+import { generateCodeVerifier, generateCodeChallenge } from './pkce';
+
 let accessToken = '';
-let expiresIn = 0; // the expiration time
+
+const clientId = 'b1c6fbb44a704c81968e06a3242d0fef';
+const redirectUri = 'http://127.0.0.1:3000/';
+const scopes = 'playlist-modify-public';
 
 const Spotify = {
-  getAccessToken() {
-    if (accessToken) {
-      return accessToken;
-    }
-    const accessTokenMatch = window.location.href.match(/access_token=([^&]*)/);
-    const expiresInMatch = window.location.href.match(/expires_in=([^&]*)/);
+  async getAccessToken() {
+    if (accessToken) return accessToken;
 
-    if (accessTokenMatch && expiresInMatch) {
-      accessToken = accessTokenMatch[1];
-      expiresIn = Number(expiresInMatch[1]);
+    // 1. Check for code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
 
-      localStorage.setItem('access_token', accessToken);
+    if (!code) {
+      // 2. No code: start auth flow
+      const codeVerifier = generateCodeVerifier();
+      localStorage.setItem('pkce_code_verifier', codeVerifier);
+      const codeChallenge = await generateCodeChallenge(codeVerifier);
 
-      window.setTimeout(() => accessToken = '', expiresIn * 1000);
-
-      window.history.pushState('Access Token', null, '/');
-      return accessToken;
-    } else {
-      const clientId = 'b1c6fbb44a704c81968e06a3242d0fef';
-      const redirectUri = 'http://127.0.0.1:3000/';
-      const scopes = 'playlist-modify-public';
-
-      const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&scope=${scopes}&redirect_uri=${redirectUri}`;
+      const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
       window.location = authUrl;
+      return;
+    } else {
+      // 3. Code present: exchange for token
+      const codeVerifier = localStorage.getItem('pkce_code_verifier');
+      const body = new URLSearchParams({
+        client_id: clientId,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        code_verifier: codeVerifier
+      });
+
+      const response = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+
+      const data = await response.json();
+      accessToken = data.access_token;
+      window.history.replaceState({}, document.title, '/'); // Clean up URL
+      return accessToken;
     }
   },
 
-  search(term) {
-    const accessToken = this.getAccessToken();
-    return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`, {
-      headers: {
-        Authorization: 'Bearer ' + accessToken
-      }
+  async search(term) {
+    const token = await this.getAccessToken();
+    return fetch(`https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(term)}`, {
+      headers: { Authorization: 'Bearer ' + token }
     })
       .then(response => response.json())
       .then(jsonResponse => {
-        if (!jsonResponse.tracks) {
-          return [];
-        }
+        if (!jsonResponse.tracks) return [];
         return jsonResponse.tracks.items.map(track => ({
           id: track.id,
           name: track.name,
