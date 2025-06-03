@@ -3,38 +3,53 @@ let expiresIn = 0; // the expiration time
 
 const Spotify = {
   getAccessToken() {
-    //If we already have the token return it
     if (accessToken) {
-      return accessToken
-    };
-    // check the URL for the token
+      return accessToken;
+    }
     const accessTokenMatch = window.location.href.match(/access_token=([^&]*)/);
     const expiresInMatch = window.location.href.match(/expires_in=([^&]*)/);
 
     if (accessTokenMatch && expiresInMatch) {
       accessToken = accessTokenMatch[1];
-      expiresIn = expiresInMatch[1];
+      expiresIn = Number(expiresInMatch[1]);
 
-      //Store it in localStorage so you can use it in getProfile()
       localStorage.setItem('access_token', accessToken);
 
-      //Set a timeout to clear the token when it expires
-      window.setTimeout(() => accessToken = '', expiresIn * 3600);
+      window.setTimeout(() => accessToken = '', expiresIn * 1000);
 
-      //Clean the URL
       window.history.pushState('Access Token', null, '/');
       return accessToken;
     } else {
-      //Redirect to Spotify login
-      const clientId = '';
-      const redirectUri = 'http://localhost:3000/';
+      const clientId = 'b1c6fbb44a704c81968e06a3242d0fef';
+      const redirectUri = 'http://127.0.0.1:3000/';
       const scopes = 'playlist-modify-public';
 
       const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&scope=${scopes}&redirect_uri=${redirectUri}`;
       window.location = authUrl;
     }
+  },
+
+  search(term) {
+    const accessToken = this.getAccessToken();
+    return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`, {
+      headers: {
+        Authorization: 'Bearer ' + accessToken
+      }
+    })
+      .then(response => response.json())
+      .then(jsonResponse => {
+        if (!jsonResponse.tracks) {
+          return [];
+        }
+        return jsonResponse.tracks.items.map(track => ({
+          id: track.id,
+          name: track.name,
+          artist: track.artists[0].name,
+          album: track.album.name,
+          uri: track.uri
+        }));
+      });
   }
 };
-
 
 export default Spotify;

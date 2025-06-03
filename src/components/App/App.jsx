@@ -37,25 +37,33 @@ function App() {
 
   }
 
-async function getProfile() {
-  const accessToken = Spotify.getAccessToken();
+  async function getProfile() {
+    const accessToken = Spotify.getAccessToken();
 
-  const response = await fetch('https://api.spotify.com/v1/me', {
-    headers: {
-      Authorization: 'Bearer ' + accessToken
-    }
-  });
+    const response = await fetch('https://api.spotify.com/v1/me', {
+      headers: {
+        Authorization: 'Bearer ' + accessToken
+      }
+    });
 
-  const data = await response.json();
-  console.log(data); // Should show your Spotify profile info
-}
+    const data = await response.json();
+    console.log(data); // Should show your Spotify profile info
+  }
+
+  function searchSpotify(term) {
+    Spotify.search(term).then(results => {
+      console.log(results)
+      setSearchResults(results)
+    });
+  }
+
 
   return (
     <div className={styles.App}>
       <h1>
         Jammming <span className="highlight">App</span>
       </h1>
-      <SearchBar />
+      <SearchBar onSearch={searchSpotify} />
       <div className={styles['App-playlist']}>
         <SearchResults searchResults={searchResults} addTrack={addTrack} />
         <Playlist
