@@ -63,6 +63,44 @@ const Spotify = {
           uri: track.uri
         }));
       });
+  },
+
+  async savePlaylist(name, uris) {
+    if (!name || !uris.length) return;
+    const token = await this.getAccessToken();
+    const userResponse = await fetch('https://api.spotify.com/v1/me', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+
+    const userData = await userResponse.json();
+    const userId = userData.id;
+
+    const playlistResponse = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name,
+        description: 'Created with Jammming',
+        public: true
+      })
+    });
+    const playlistData = await playlistResponse.json();
+    const playlistId = playlistData.id;
+
+    await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        uris: uris
+      })
+    });
+
   }
 };
 
