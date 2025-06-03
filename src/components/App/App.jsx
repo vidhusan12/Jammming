@@ -19,6 +19,9 @@ function App() {
     { id: 3, name: 'Song C', artist: 'Artist C', album: 'Album C', uri: 'spotify:track:ghi789' }
   ]);
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
   function addTrack(track) {
     if (!playlistTracks.find(savedTrack => savedTrack.id === track.id)) {
       setPlaylistTracks([...playlistTracks, track]);
@@ -29,9 +32,15 @@ function App() {
     setPlaylistTracks(playlistTracks.filter(savedTrack => savedTrack.id !== track.id));
   }
 
-  function savePlaylist() {
+  async function savePlaylist() {
     const trackUris = playlistTracks.map(track => track.uri);
     console.log("Saving playlist with URIs: ", trackUris);
+    setLoading(true);
+    setSuccess(false)
+    await Spotify.savePlaylist(playlistName, trackUris);
+    setLoading(false);
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 2000);
     setPlaylistName("New Playlist"); //resets the playlsit
     setPlaylistTracks([]); //resets the playlist Track
 
@@ -50,10 +59,10 @@ function App() {
     console.log(data); // Should show your Spotify profile info
   }
 
-async function searchSpotify(term) {
-  const results = await Spotify.search(term); // <-- await here
-  setSearchResults(results);
-}
+  async function searchSpotify(term) {
+    const results = await Spotify.search(term); // <-- await here
+    setSearchResults(results);
+  }
 
 
   return (
@@ -62,6 +71,9 @@ async function searchSpotify(term) {
         Jammming <span className="highlight">App</span>
       </h1>
       <SearchBar onSearch={searchSpotify} />
+      {loading && <div className={styles.spinner}></div>}
+      {success && <div className={styles.success}>Playlist saved!</div>}
+
       <div className={styles['App-playlist']}>
         <SearchResults searchResults={searchResults} addTrack={addTrack} />
         <Playlist
@@ -71,6 +83,7 @@ async function searchSpotify(term) {
           isRemoval={true}
           removeTrack={removeTrack}
           savePlaylist={savePlaylist}
+          disabled={loading}
         />
       </div>
     </div>

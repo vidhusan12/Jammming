@@ -44,6 +44,34 @@ h2 {
   width: 100%;
 }
 
+.spinner {
+  border: 6px solid #eee;           /* Light grey */
+  border-top: 6px solid #6c41ec;    /* Accent color */
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: s____ 1s linear infinite; /* Fill in the animation name */
+  margin: 2rem auto;
+}
+
+@keyframes s____ { /* Fill in the animation name */
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.success {
+  background: #1db954;      /* Spotify green */
+  color: #fff;
+  padding: 1rem 2rem;
+  border-radius: 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 1.5rem auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  width: fit-content;
+}
+
 @media only screen and (max-width: 1020px) {
   .App-playlist {
     align-items: center;
