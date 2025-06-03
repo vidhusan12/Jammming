@@ -3,6 +3,7 @@ import styles from './App.module.css';
 import SearchBar from '../SearchBar/SearchBar';
 import SearchResults from '../SearchResults/SearchResults';
 import Playlist from '../Playlist/Playlist';
+import Spotify from '../../Spotify';
 
 function App() {
   const [searchResults, setSearchResults] = useState([
@@ -35,6 +36,19 @@ function App() {
     setPlaylistTracks([]); //resets the playlist Track
 
   }
+
+async function getProfile() {
+  const accessToken = Spotify.getAccessToken();
+
+  const response = await fetch('https://api.spotify.com/v1/me', {
+    headers: {
+      Authorization: 'Bearer ' + accessToken
+    }
+  });
+
+  const data = await response.json();
+  console.log(data); // Should show your Spotify profile info
+}
 
   return (
     <div className={styles.App}>
